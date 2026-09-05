@@ -53,6 +53,31 @@
     /* ====== THÔNG BÁO LỖI ====== */
     .error-text { color: #ef4444; font-size: 13px; margin-top: 6px; display: none; }
   </style>
+  <script type="module">
+  // ====== KẾT NỐI FIREBASE ======
+  const firebaseConfig = {
+    apiKey: "AIzaSyDvfVuaTYGeX5k3wMvAY-BVDi2x69xRtKI",
+    authDomain: "cho-dien-thoai-cu.firebaseapp.com",
+    projectId: "cho-dien-thoai-cu",
+    storageBucket: "cho-dien-thoai-cu.firebasestorage.app",
+    messagingSenderId: "462484690943",
+    appId: "1:462484690943:web:32bec4d5febc4bd00bf9ca",
+    measurementId: "G-FK19SPX0M4"
+  };
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window.auth = auth;
+  window.db = db;
+  // ==============================
+</script>
+
 </head>
 <body>
 
