@@ -47,16 +47,30 @@
 
     /* ====== THÔNG BÁO LỖI ====== */
     .error-box { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 12px; border-radius: 10px; font-size: 14px; margin-bottom: 20px; display: none; }
-  </style>
+  </style
+  <script type="module">
   const firebaseConfig = {
-  apiKey: "AIzaSyDvfVuaTYGeX5k3wMvAY-BVDi2x69xRtKI",
-  authDomain: "cho-dien-thoai-cu.firebaseapp.com",
-  projectId: "cho-dien-thoai-cu",
-  storageBucket: "cho-dien-thoai-cu.firebasestorage.app",
-  messagingSenderId: "462484690943",
-  appId: "1:462484690943:web:32bec4d5febc4bd00bf9ca",
-  measurementId: "G-FK19SPX0M4"
-};
+    apiKey: "AIzaSyDvfVuaTYGeX5k3wMvAY-BVDi2x69xRtKI",
+    authDomain: "cho-dien-thoai-cu.firebaseapp.com",
+    projectId: "cho-dien-thoai-cu",
+    storageBucket: "cho-dien-thoai-cu.firebasestorage.app",
+    messagingSenderId: "462484690943",
+    appId: "1:462484690943:web:32bec4d5febc4bd00bf9ca",
+    measurementId: "G-FK19SPX0M4"
+  };
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+  import { getFirestore } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  window.auth = auth;
+  window.db = db;
+</script>
+
 
 </head>
 <body>
