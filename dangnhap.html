@@ -8,18 +8,15 @@
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
     body { background: #f5f7fa; min-height: 100vh; padding: 20px; }
 
-    /* ====== NÚT QUAY LẠI ====== */
     .back-btn { display: flex; align-items: center; gap: 6px; color: #3b82f6; font-size: 15px; font-weight: 500; cursor: pointer; margin-bottom: 24px; border: none; background: none; }
     .back-btn:active { opacity: 0.7; }
 
-    /* ====== KHỐI CHÍNH ====== */
     .container { max-width: 400px; margin: 0 auto; }
     .logo-box { text-align: center; margin-bottom: 36px; }
     .logo { width: 64px; height: 64px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; color: white; margin-bottom: 12px; }
     .app-title { font-size: 22px; font-weight: 700; color: #111827; margin-bottom: 4px; }
     .app-desc { font-size: 14px; color: #6b7280; }
 
-    /* ====== FORM ====== */
     .form-card { background: white; border-radius: 20px; padding: 32px 24px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
     .form-title { font-size: 20px; font-weight: 700; margin-bottom: 28px; color: #111827; text-align: center; }
     .form-group { margin-bottom: 18px; }
@@ -28,52 +25,42 @@
     input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
     input.error { border-color: #ef4444; }
 
-    /* ====== QUÊN MẬT KHẨU ====== */
     .forgot-wrap { text-align: right; margin-bottom: 24px; }
     .forgot-link { font-size: 14px; color: #3b82f6; text-decoration: none; }
     .forgot-link:active { opacity: 0.7; }
 
-    /* ====== NÚT ĐĂNG NHẬP ====== */
     .btn-submit { width: 100%; padding: 15px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all .2s; }
     .btn-submit:active { transform: scale(.98); }
     .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
 
-    /* ====== PHÂN CÁCH & LIÊN KẾT ====== */
     .divider { display: flex; align-items: center; gap: 12px; margin: 28px 0 24px; }
     .divider::before, .divider::after { content: ''; flex: 1; height: 1px solid #e5e7eb; }
     .divider-text { font-size: 13px; color: #9ca3af; }
     .link-text { text-align: center; font-size: 14px; color: #6b7280; }
     .link-text a { color: #3b82f6; font-weight: 600; text-decoration: none; }
 
-    /* ====== THÔNG BÁO LỖI ====== */
     .error-box { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 12px; border-radius: 10px; font-size: 14px; margin-bottom: 20px; display: none; }
-  </style
-
+  </style>
 </head>
 <body>
 
   <div class="container">
-    <!-- Nút quay lại → về màn hình chính -->
     <button class="back-btn" onclick="history.back()">← Quay lại</button>
 
-    <!-- Logo & Tên app -->
     <div class="logo-box">
       <div class="logo">📱</div>
       <h1 class="app-title">Chợ Điện Thoại Cũ</h1>
       <p class="app-desc">Đăng nhập để tiếp tục</p>
     </div>
 
-    <!-- Form Đăng nhập -->
     <div class="form-card">
       <h2 class="form-title">Đăng nhập tài khoản</h2>
-
-      <!-- Thông báo lỗi -->
-      <div class="error-box" id="errorBox">Số điện thoại hoặc mật khẩu không đúng!</div>
+      <div class="error-box" id="errorBox"></div>
 
       <form id="loginForm">
         <div class="form-group">
-          <label>Số điện thoại hoặc Email</label>
-          <input type="text" id="account" placeholder="09xxxxxxxxx hoặc email@gmail.com" required>
+          <label>Email</label>
+          <input type="email" id="email" placeholder="email@gmail.com" required>
         </div>
 
         <div class="form-group">
@@ -89,91 +76,10 @@
       </form>
 
       <div class="divider"><span class="divider-text">hoặc</span></div>
-
       <p class="link-text">Chưa có tài khoản? <a href="dangky.html">Đăng ký ngay</a></p>
     </div>
   </div>
 
-  <script>
-    const form = document.getElementById('loginForm');
-    const submitBtn = document.getElementById('submitBtn');
-    const errorBox = document.getElementById('errorBox');
-
-    // Hiển thị lỗi
-    function showError(message) {
-      errorBox.textContent = message;
-      errorBox.style.display = 'block';
-      setTimeout(() => errorBox.style.display = 'none', 4000);
-    }
-
-    // Kiểm tra tài khoản trong danh sách chờ & đã duyệt
-    function checkAccount(account, password) {
-      // Lấy dữ liệu đã đăng ký
-      const pendingUsers = JSON.parse(localStorage.getItem('pendingUsers') || '[]');
-      const approvedUsers = JSON.parse(localStorage.getItem('approvedUsers') || '[]');
-
-      // Tìm trong danh sách đã duyệt
-      const user = approvedUsers.find(u => 
-        (u.phone === account || u.email === account) && u.password === password
-      );
-      if (user) return { success: true, user };
-
-      // Tìm trong danh sách chờ duyệt
-      const pending = pendingUsers.find(u => 
-        (u.phone === account || u.email === account)
-      );
-      if (pending) return { success: false, reason: 'pending' };
-
-      // Không tìm thấy
-      return { success: false, reason: 'notfound' };
-    }
-
-    // Gửi form đăng nhập
-    form.addEventListener('submit', async function(e) {
-      e.preventDefault();
-      
-      const account = document.getElementById('account').value.trim();
-      const password = document.getElementById('password').value;
-
-      if (!account || !password) {
-        showError('Vui lòng nhập đầy đủ thông tin!');
-        return;
-      }
-
-      // Hiệu ứng đang xử lý
-      submitBtn.disabled = true;
-      submitBtn.textContent = '⏳ Đang kiểm tra...';
-
-      // Giả lập độ trễ
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      // Kiểm tra tài khoản
-      const result = checkAccount(account, password);
-
-      submitBtn.disabled = false;
-      submitBtn.textContent = '🔐 Đăng nhập';
-
-      if (result.success) {
-        // Lưu phiên đăng nhập
-        localStorage.setItem('currentUser', JSON.stringify(result.user));
-        // Chuyển về trang chủ hoặc trang hồ sơ
-        alert('✅ Đăng nhập thành công!');
-        window.location.href = 'nguoiban.html';
-      } else {
-        if (result.reason === 'pending') {
-          showError('⏳ Tài khoản đang chờ quản trị viên duyệt. Vui lòng kiểm tra email!');
-        } else {
-          showError('❌ Số điện thoại/Email hoặc mật khẩu không đúng!');
-        }
-      }
-    });
-
-    // Quên mật khẩu — thông báo chức năng đang phát triển
-    document.getElementById('forgotPass').addEventListener('click', e => {
-      e.preventDefault();
-      alert('📧 Vui lòng liên hệ hỗ trợ qua: support@chodienthoaicũ.vn\nChúng tôi sẽ hướng dẫn lấy lại mật khẩu!');
-    });
-  </script>
 <!-- Kết nối Firebase -->
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
@@ -188,13 +94,98 @@ const firebaseConfig = {
   appId: "1:462484690943:web:32bec4d5febc4bd00bf9ca",
   measurementId: "G-FK19SPX0M4"
 };
+
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.firestore();
-window.auth = auth;
-window.db = db;
-</script>
 
+// ===== XỬ LÝ ĐĂNG NHẬP =====
+const loginForm = document.getElementById('loginForm');
+const errorBox = document.getElementById('errorBox');
+const submitBtn = document.getElementById('submitBtn');
+
+function showError(msg) {
+  errorBox.textContent = msg;
+  errorBox.style.display = 'block';
+}
+
+loginForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  errorBox.style.display = 'none';
+
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+
+  if (!email || !password) {
+    return showError('Vui lòng nhập Email và Mật khẩu!');
+  }
+
+  submitBtn.disabled = true;
+  submitBtn.textContent = '⏳ Đang đăng nhập...';
+
+  try {
+    // 1. Đăng nhập với Firebase Auth
+    const userCredential = await auth.signInWithEmailAndPassword(email, password);
+    const user = userCredential.user;
+
+    // 2. Lấy thông tin từ Firestore
+    const userDoc = await db.collection('users').doc(user.uid).get();
+    if (!userDoc.exists) throw new Error('Tài khoản không tồn tại!');
+
+    const userData = userDoc.data();
+
+    // 3. Kiểm tra trạng thái duyệt
+    if (userData.status === 'pending') {
+      throw new Error('⏳ Tài khoản đang chờ duyệt! Vui lòng chờ Admin phê duyệt.');
+    }
+    if (userData.status === 'rejected') {
+      throw new Error('❌ Tài khoản bị từ chối!');
+    }
+    if (userData.status !== 'approved') {
+      throw new Error('Trạng thái tài khoản không hợp lệ!');
+    }
+
+    // 4. Đăng nhập thành công
+    localStorage.setItem('currentUser', JSON.stringify(userData));
+    alert('✅ Đăng nhập thành công!');
+
+    // 5. Chuyển trang
+    if (userData.role === 'admin') {
+      window.location.href = 'quantri.html';
+    } else {
+      window.location.href = 'nguoi-ban.html';
+    }
+
+  } catch (err) {
+    console.error(err);
+    let msg = err.message;
+    if (msg.includes('auth/user-not-found') || msg.includes('auth/wrong-password')) {
+      msg = '❌ Email hoặc Mật khẩu không đúng!';
+    } else if (msg.includes('auth/invalid-email')) {
+      msg = '❌ Email không hợp lệ!';
+    } else if (msg.includes('auth/network-request-failed')) {
+      msg = '❌ Kiểm tra kết nối mạng!';
+    }
+    showError(msg);
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = '🔐 Đăng nhập';
+  }
+});
+
+// Quên mật khẩu
+document.getElementById('forgotPass').addEventListener('click', async (e) => {
+  e.preventDefault();
+  const email = prompt('Nhập Email của bạn:');
+  if (!email) return;
+  try {
+    await auth.sendPasswordResetEmail(email);
+    alert('✅ Đã gửi link đặt lại mật khẩu! Kiểm tra Email nhé.');
+  } catch (e) {
+    alert('❌ Không gửi được! Kiểm tra Email đã đăng ký chưa.');
+  }
+});
+</script>
 
 </body>
 </html>
