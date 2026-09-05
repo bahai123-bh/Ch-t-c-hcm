@@ -369,15 +369,14 @@ document.getElementById('btnProfile').addEventListener('click', async () => {
     }
 
     const userData = userDoc.data();
-    if (userData.role === "admin") {
-      window.location.href = 'admin.html'; // ⚙️ Trang Quản trị
-    } else if (userData.role === "seller" && userData.approved === true) {
-      window.location.href = 'nguoi-ban.html'; // 🛒 Trang Người bán
+    if (userData.role === "admin" && userData.status === "approved") {
+      window.location.href = 'quantri.html';
+    } else if (userData.role === "seller" && userData.status === "approved") {
+      window.location.href = 'nguoi-ban.html';
     } else {
       alert("Tài khoản đang chờ duyệt!");
     }
-  } catch (error) {
-    console.error("Lỗi điều hướng:", error);
+
     alert("Có lỗi xảy ra, vui lòng thử lại!");
   }
 });
