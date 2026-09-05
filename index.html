@@ -385,9 +385,9 @@
 
       const userData = userDoc.data();
       if (userData.role === "admin" && userData.status === "approved") {
-        window.location.href = 'quantri.html';
+        window.location.href = 'admin.html';
       } else if (userData.role === "seller" && userData.status === "approved") {
-        window.location.href = 'nguoi-ban.html';
+        window.location.href = 'nguoiban.html';
       } else {
         alert("Tài khoản đang chờ duyệt!");
       }
