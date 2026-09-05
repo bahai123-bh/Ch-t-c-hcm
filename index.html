@@ -322,65 +322,82 @@
   </script>
   // ====== KIỂM TRA ĐĂNG NHẬP & ĐIỀU HƯỚNG TỰ ĐỘNG ======
 <script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
   import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
   import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
-const auth = getAuth();
-const db = getFirestore();
 
-// Cập nhật nút Hồ sơ theo trạng thái đăng nhập
-onAuthStateChanged(auth, async (user) => {
-  const btnProfile = document.getElementById('btnProfile');
-  
-  if (user) {
-    // ✅ Đã đăng nhập → lấy quyền người dùng
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    if (userDoc.exists()) {
-      const role = userDoc.data().role;
-      
-      // Thay đổi chữ trên nút
-      if (role === "admin") {
-        btnProfile.innerHTML = "⚙️ Quản trị";
-      } else if (role === "seller") {
-        btnProfile.innerHTML = "🛒 Cửa hàng";
+  const firebaseConfig = {
+    apiKey: "AIzaSyDvfVuaTYGeX5k3wMvAY-BVDi2x69xRtKI",
+    authDomain: "cho-dien-thoai-cu.firebaseapp.com",
+    projectId: "cho-dien-thoai-cu",
+    storageBucket: "cho-dien-thoai-cu.firebasestorage.app",
+    messagingSenderId: "462484690943",
+    appId: "1:462484690943:web:32bec4d5febc4bd00bf9ca",
+    measurementId: "G-FK19SPX0M4"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Biến toàn cục lưu user đã đăng nhập
+  window.currentUser = null;
+
+  onAuthStateChanged(auth, async (user) => {
+    window.currentUser = user; // Cập nhật user khi Firebase load xong
+    const btnProfile = document.getElementById('btnProfile');
+    if (!btnProfile) return;
+    
+    if (user) {
+      try {
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+        if (userDoc.exists()) {
+          const role = userDoc.data().role;
+          if (role === "admin") {
+            btnProfile.innerHTML = "⚙️ Quản trị";
+          } else if (role === "seller") {
+            btnProfile.innerHTML = "🛒 Cửa hàng";
+          }
+        }
+      } catch (e) {
+        console.error("Lỗi tải quyền:", e);
       }
+    } else {
+      btnProfile.innerHTML = "👤 Hồ sơ";
     }
-  } else {
-    // ❌ Chưa đăng nhập → giữ nguyên
-    btnProfile.innerHTML = "👤 Hồ sơ";
-  }
-});
+  });
 
-// Xử lý khi bấm nút Hồ sơ
-document.getElementById('btnProfile').addEventListener('click', async () => {
-  const user = auth.currentUser;
-  
-  if (!user) {
-    // ❌ Chưa đăng nhập → đi tới trang đăng nhập
-    window.location.href = 'dangnhap.html';
-    return;
-  }
-
-  // ✅ Đã đăng nhập → lấy quyền và điều hướng đúng trang
-  try {
-    const userDoc = await getDoc(doc(db, "users", user.uid));
-    if (!userDoc.exists()) {
-      alert("Tài khoản chưa được duyệt!");
+  // Xử lý khi bấm nút Hồ sơ
+  document.getElementById('btnProfile').addEventListener('click', async () => {
+    const user = window.currentUser;
+    
+    if (!user) {
+      window.location.href = 'dangnhap.html';
       return;
     }
 
-    const userData = userDoc.data();
-    if (userData.role === "admin" && userData.status === "approved") {
-      window.location.href = 'quantri.html';
-    } else if (userData.role === "seller" && userData.status === "approved") {
-      window.location.href = 'nguoi-ban.html';
-    } else {
-      alert("Tài khoản đang chờ duyệt!");
-    }
+    try {
+      const userDoc = await getDoc(doc(db, "users", user.uid));
+      if (!userDoc.exists()) {
+        alert("Tài khoản chưa được duyệt!");
+        return;
+      }
 
-    alert("Có lỗi xảy ra, vui lòng thử lại!");
-  }
-});
+      const userData = userDoc.data();
+      if (userData.role === "admin" && userData.status === "approved") {
+        window.location.href = 'quantri.html';
+      } else if (userData.role === "seller" && userData.status === "approved") {
+        window.location.href = 'nguoi-ban.html';
+      } else {
+        alert("Tài khoản đang chờ duyệt!");
+      }
+    } catch (error) {
+      console.error("Lỗi điều hướng:", error);
+      alert("Có lỗi xảy ra, vui lòng thử lại!");
+    }
+  });
 </script>
+
 
 <!-- Kết nối Firebase -->
 <script type="module" src="firebase.js"></script>
