@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Chợ Điện Thoại Cũ — TPHCM</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: #f5f7fa; color: #1e293b; max-width: 100%; margin: 0 auto; min-height: 100vh; padding-bottom: 100px; }
+
+    /* ====== HEADER ====== */
+    .header { display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; background: #fff; border-bottom: 1px solid #e5e7eb; position: sticky; top: 0; z-index: 100; }
+    .logo-wrap { display: flex; align-items: center; gap: 10px; }
+    .logo { width: 40px; height: 40px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 10px; display: flex; align-items: center; justify-content: center; color: white; font-size: 20px; }
+    .app-name { font-size: 17px; font-weight: 700; color: #111827; }
+    .online-badge { display: flex; align-items: center; gap: 6px; background: #f0fdf4; padding: 6px 12px; border-radius: 20px; }
+    .dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1;} 50%{opacity:.4;} }
+    .online-text { font-size: 13px; color: #166534; font-weight: 500; }
+
+    /* ====== SEARCH ====== */
+    .search-box { margin: 12px 16px; position: relative; z-index: 99; }
+    .search-input { width: 100%; padding: 12px 16px 12px 44px; border: none; border-radius: 12px; background: #fff; font-size: 15px; box-shadow: 0 1px 3px rgba(0,0,0,.06); outline: none; }
+    .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #9ca3af; font-size: 18px; }
+
+    /* ====== QUẬN SCROLL ====== */
+    .district-section { padding: 8px 0; background: #fff; border-bottom: 1px solid #f3f4f6; margin-bottom: 8px; }
+    .district-container { padding: 0 16px; overflow-x: auto; scrollbar-width: none; }
+    .district-container::-webkit-scrollbar { display: none; }
+    .district-list { display: flex; gap: 10px; white-space: nowrap; padding: 4px 0; }
+    .district-chip { padding: 8px 16px; background: #f9fafb; border-radius: 20px; font-size: 14px; color: #4b5563; border: 1px solid #e5e7eb; cursor: pointer; transition: all .2s; flex-shrink: 0; }
+    .district-chip.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+
+    /* ====== PHƯỜNG ====== */
+    .ward-container { padding: 0 16px; background: #fff; border-bottom: 1px solid #f3f4f6; max-height: 0; overflow: hidden; transition: max-height .3s ease, padding .3s ease; margin-bottom: 8px; }
+    .ward-container.show { max-height: 380px; padding: 14px 16px; overflow-y: auto; }
+    .ward-title { font-size: 14px; font-weight: 600; color: #374151; margin-bottom: 12px; }
+    .ward-list { display: flex; flex-wrap: wrap; gap: 8px; }
+    .ward-chip { padding: 7px 14px; background: #f9fafb; border-radius: 16px; font-size: 13px; color: #4b5563; border: 1px solid #e5e7eb; cursor: pointer; transition: all .2s; }
+    .ward-chip.active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+
+    /* ====== SẢN PHẨM ====== */
+    .products-section { padding: 0 16px; }
+    .section-title { font-size: 16px; font-weight: 700; margin-bottom: 14px; color: #111827; }
+    .products-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .product-card { background: #fff; border-radius: 16px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,.05); transition: transform .2s; }
+    .product-card:active { transform: scale(.98); }
+    .product-img-wrap { width: 100%; height: 170px; background: linear-gradient(135deg, #eff6ff, #dbeafe); display: flex; align-items: center; justify-content: center; }
+    .product-img { font-size: 52px; }
+    .product-info { padding: 12px; }
+    .product-name { font-size: 15px; font-weight: 600; margin-bottom: 8px; color: #111827; line-height: 1.4; }
+    .product-price-wrap { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-bottom: 6px; }
+    .price-old { font-size: 13px; color: #9ca3af; text-decoration: line-through; }
+    .price-new { font-size: 16px; font-weight: 700; color: #f97316; }
+    .product-location { font-size: 12px; color: #6b7280; display: flex; align-items: center; gap: 4px; }
+
+    /* ====== BOTTOM NAV ====== */
+    .bottom-nav { position: fixed; bottom: 0; left: 50%; transform: translateX(-50%); width: 100%; max-width: 430px; background: #fff; border-top: 1px solid #e5e7eb; display: flex; padding: 10px 16px 24px; gap: 10px; z-index: 200; }
+    .nav-btn { flex: 1; padding: 14px 8px; border-radius: 14px; font-size: 15px; font-weight: 600; border: none; cursor: pointer; transition: all .2s; }
+    .btn-coupon { background: linear-gradient(135deg, #fb923c, #f97316); color: #fff; }
+    .btn-coupon:active { transform: scale(.97); }
+    .btn-register { background: #3b82f6; color: #fff; }
+    .btn-register:active { transform: scale(.97); }
+    .btn-profile { background: #f3f4f6; color: #4b5563; }
+    .btn-profile:active { background: #e5e7eb; }
+
+    /* ====== MODAL ====== */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; z-index: 300; padding: 20px; }
+    .modal-content { background: #fff; border-radius: 20px; padding: 28px 24px 24px; width: 100%; max-width: 360px; text-align: center; animation: modalIn .3s ease; }
+    @keyframes modalIn { from{transform: translateY(30px);opacity:0;} to{transform: translateY(0);opacity:1;} }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 16px; color: #111827; }
+    .coupon-code-box { background: #fffbeb; border: 2px dashed #f97316; border-radius: 12px; padding: 16px; font-size: 28px; font-weight: 700; color: #c2410c; letter-spacing: 4px; margin-bottom: 20px; font-family: monospace; }
+    .discount-rules { text-align: left; background: #f9fafb; border-radius: 10px; padding: 14px; margin-bottom: 20px; font-size: 13px; line-height: 1.8; }
+    .discount-rules p { margin: 4px 0; color: #4b5563; }
+    .discount-rules strong { color: #f97316; }
+    .modal-buttons { display: flex; gap: 10px; }
+    .modal-btn { flex: 1; padding: 13px; border-radius: 12px; border: none; font-size: 15px; font-weight: 600; cursor: pointer; }
+    .btn-copy { background: #3b82f6; color: #fff; }
+    .btn-close { background: #f3f4f6; color: #4b5563; }
+  </style>
+</head>
+<body>
+
+  <header class="header">
+    <div class="logo-wrap">
+      <div class="logo">📱</div>
+      <span class="app-name">Chợ Điện Thoại Cũ</span>
+    </div>
+    <div class="online-badge">
+      <span class="dot"></span>
+      <span class="online-text" id="onlineCount">Online: 119</span>
+    </div>
+  </header>
+
+  <div class="search-box">
+    <span class="search-icon">🔍</span>
+    <input type="text" class="search-input" placeholder="Tìm máy, hãng, giá...">
+  </div>
+
+  <!-- ====== QUẬN — ĐÃ SỬA HIỂN THỊ ====== -->
+  <div class="district-section">
+    <div class="district-container">
+      <div class="district-list" id="districtList">
+        <span class="district-chip active" data-district="all">Tất cả</span>
+        <span class="district-chip" data-district="q1">Quận 1</span>
+        <span class="district-chip" data-district="q2">Quận 2</span>
+        <span class="district-chip" data-district="q3">Quận 3</span>
+        <span class="district-chip" data-district="q4">Quận 4</span>
+        <span class="district-chip" data-district="q5">Quận 5</span>
+        <span class="district-chip" data-district="q6">Quận 6</span>
+        <span class="district-chip" data-district="q7">Quận 7</span>
+        <span class="district-chip" data-district="q8">Quận 8</span>
+        <span class="district-chip" data-district="q10">Quận 10</span>
+        <span class="district-chip" data-district="q11">Quận 11</span>
+        <span class="district-chip" data-district="q12">Quận 12</span>
+        <span class="district-chip" data-district="tb">Tân Bình</span>
+        <span class="district-chip" data-district="tp">Tân Phú</span>
+        <span class="district-chip" data-district="bt">Bình Thạnh</span>
+        <span class="district-chip" data-district="btan">Bình Tân</span>
+        <span class="district-chip" data-district="gv">Gò Vấp</span>
+        <span class="district-chip" data-district="pn">Phú Nhuận</span>
+        <span class="district-chip" data-district="td">Thủ Đức</span>
+        <span class="district-chip" data-district="bc">Bình Chánh</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== PHƯỜNG ====== -->
+  <div class="ward-container" id="wardContainer">
+    <p class="ward-title" id="wardTitle">📍 Chọn phường</p>
+    <div class="ward-list" id="wardList"></div>
+  </div>
+
+  <!-- ====== SẢN PHẨM ====== -->
+  <section class="products-section">
+    <p class="section-title">📱 Máy đang bán</p>
+    <div class="products-grid">
+      <div class="product-card">
+        <div class="product-img-wrap"><span class="product-img">📱</span></div>
+        <div class="product-info">
+          <h3 class="product-name">iPhone 11 64GB</h3>
+          <div class="product-price-wrap">
+            <span class="price-old">4.500.000đ</span>
+            <span class="price-new">4.200.000đ</span>
+          </div>
+          <p class="product-location">📍 Quận 1</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-img-wrap"><span class="product-img">📱</span></div>
+        <div class="product-info">
+          <h3 class="product-name">Samsung S22</h3>
+          <div class="product-price-wrap">
+            <span class="price-old">7.500.000đ</span>
+            <span class="price-new">7.200.000đ</span>
+          </div>
+          <p class="product-location">📍 Quận 3</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-img-wrap"><span class="product-img">📱</span></div>
+        <div class="product-info">
+          <h3 class="product-name">iPhone 12 128GB</h3>
+          <div class="product-price-wrap">
+            <span class="price-old">6.200.000đ</span>
+            <span class="price-new">5.900.000đ</span>
+          </div>
+          <p class="product-location">📍 Gò Vấp</p>
+        </div>
+      </div>
+      <div class="product-card">
+        <div class="product-img-wrap"><span class="product-img">📱</span></div>
+        <div class="product-info">
+          <h3 class="product-name">Redmi Note 12</h3>
+          <div class="product-price-wrap">
+            <span class="price-old">3.200.000đ</span>
+            <span class="price-new">3.000.000đ</span>
+          </div>
+          <p class="product-location">📍 Bình Tân</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== BOTTOM NAV ====== -->
+  <nav class="bottom-nav">
+    <button class="nav-btn btn-coupon" id="btnCoupon">🎟️ Mã giảm giá</button>
+    <button class="nav-btn btn-register" onclick="window.location.href='dangky.html'">➕ Đăng ký</button>
+    <button class="nav-btn btn-profile" onclick="window.location.href='dangnhap.html'">👤 Hồ sơ</button>
+  </nav>
+
+  <!-- ====== MODAL ====== -->
+  <div class="modal-overlay" id="couponModal">
+    <div class="modal-content">
+      <h3 class="modal-title">✅ Mã giảm giá của bạn</h3>
+      <div class="coupon-code-box" id="couponCode">A7B2K9</div>
+      <div class="discount-rules">
+        <p>💱 Hóa đơn &lt; 2.000.000đ → <strong>Giảm 50.000đ</strong></p>
+        <p>💱 Hóa đơn ≥ 2.000.000đ → <strong>Giảm 100.000đ</strong></p>
+        <p>💱 Hóa đơn ≥ 3.000.000đ → <strong>Giảm 200.000đ</strong></p>
+        <p>💱 Hóa đơn ≥ 4.000.000đ → <strong>Giảm 300.000đ</strong></p>
+        <p style="margin-top:10px; color:#6b7280; font-size:12px;">📍 Áp dụng tại cửa hàng hiển thị trên sản phẩm</p>
+      </div>
+      <div class="modal-buttons">
+        <button class="modal-btn btn-copy" id="btnCopy">📋 Sao chép</button>
+        <button class="modal-btn btn-close" id="btnClose">✅ Đã hiểu</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Online counter
+    function randomOnline() {
+      document.getElementById('onlineCount').textContent = 'Online: ' + (Math.floor(Math.random() * 101) + 100);
+    }
+    setInterval(randomOnline, 3000); randomOnline();
+
+    // ================= DỮ LIỆU 113 PHƯỜNG — CHÍNH XÁC =================
+    const wardData = {
+      q1: ['Phường Bến Nghé','Phường Bến Thành','Phường Cầu Kho','Phường Cầu Ông Lãnh','Phường Đa Kao','Phường Nguyễn Thái Bình','Phường Phạm Ngũ Lão','Phường Tân Định','Phường Tân Thành','Phường Thạnh Điện','Phường Xóm Củi'],
+      q2: ['Phường An Lợi Đông','Phường An Phú','Phường Bình An','Phường Bình Khánh','Phường Bình Trưng Tây','Phường Thảo Điền','Phường Thủ Thiêm'],
+      q3: ['Phường 1','Phường 2','Phường 3','Phường 4','Phường 5','Phường 6','Phường 7','Phường 8','Phường 9','Phường 10','Phường 11','Phường 12','Phường 13','Phường 14'],
+      q4: ['Phường 1','Phường 2','Phường 3','Phường 4','Phường 5','Phường 6','Phường 8','Phường 9','Phường 10','Phường 11'],
+      q5: ['Phường 1','Phường 2','Phường 3','Phường 4','Phường 5','Phường 6','Phường 7','Phường 8','Phường 9','Phường 10'],
+      q6: ['Phường 1','Phường 2','Phường 3','Phường 4','Phường 5','Phường 6','Phường 7','Phường 8','Phường 9','Phường 10'],
+      q7: ['Phường Tân Thuận Đông','Phường Tân Thuận Tây','Phường Tân Quy','Phường Tân Kiểng','Phường Phú Mỹ','Phường Phú Thuận','Phường Tân Phú'],
+      q8: ['Phường 1','Phường 2','Phường 3','Phường 4','Phường 5','Phường 6','Phường 7','Phường 8'],
+      q10: ['Phường 1','Phường 2','Phường 3','Phường 4','Phường 5','Phường 6','Phường 7','Phường 8'],
+      q11: ['Phường 1','Phường 2','Phường 3','Phường 4','Phường 5','Phường 6','Phường 7','Phường 8'],
+      q12: ['Phường 1','Phường 2','Phường 3','Phường 4','Phường 5','Phường 6','Phường 7','Phường 8','Phường 9','Phường 10'],
+      tb: ['Phường 1','Phường 2','Phường 3','Phường 4','Phường 5','Phường 6','Phường 7','Phường 8','Phường 9','Phường 10','Phường 11','Phường 12','Phường 13','Phường 14','Phường 15'],
+      tp: ['Phường 1','Phường 2','Phường 3','Phường 4','Phường 5','Phường 6','Phường 7','Phường 8','Phường 9','Phường 10','Phường 11','Phường 12','Phường 13','Phường 14','Phường 15'],
+      bt: ['Phường 1','Phường 2','Phường 3','Phường 4','Phường 5','Phường 6','Phường 7','Phường 8','Phường 9','Phường 10','Phường 11','Phường 12'],
+      btan: ['Phường An Lạc','Phường Bình Tân','Phường Tân Tạo','Phường Bình Trị Đông','Phường Bình Hưng Hòa'],
+      gv: ['Phường 1','Phường 2','Phường 3','Phường 4','Phường 5','Phường 6','Phường 7','Phường 8','Phường 9','Phường 10'],
+      pn: ['Phường 1','Phường 2','Phường 3','Phường 4','Phường 5','Phường 6','Phường 7','Phường 8'],
+      td: ['Phường An Khánh','Phường An Lợi','Phường An Phú','Phường Bình Chiểu','Phường Bình Thọ','Phường Hiệp Bình Chánh','Phường Hiệp Phú','Phường Linh Chiểu','Phường Linh Đông','Phường Linh Tây','Phường Linh Xuân','Phường Long Bình','Phường Long Phước','Phường Phước Long','Phường Tam Bình','Phường Tam Phú','Phường Tăng Nhơn Phú','Phường Thảo Điền','Phường Thủ Thiêm','Phường Trường Thọ'],
+      bc: ['Phường Bình Chánh','Phường Tân Túc','Phường Lê Minh Xuân']
+    };
+
+    // Quận → Phường
+    const districtChips = document.querySelectorAll('.district-chip');
+    const wardContainer = document.getElementById('wardContainer');
+    const wardTitle = document.getElementById('wardTitle');
+    const wardList = document.getElementById('wardList');
+
+    districtChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        districtChips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const districtId = chip.dataset.district;
+        if (districtId === 'all') { wardContainer.classList.remove('show'); return; }
+        wardTitle.textContent = '📍 ' + chip.textContent + ' — Chọn phường';
+        wardList.innerHTML = '';
+        if (wardData[districtId]) {
+          wardData[districtId].forEach(wardName => {
+            const wardChip = document.createElement('span');
+            wardChip.className = 'ward-chip';
+            wardChip.textContent = wardName;
+            wardChip.addEventListener('click', () => {
+              document.querySelectorAll('.ward-chip').forEach(w => w.classList.remove('active'));
+              wardChip.classList.add('active');
+            });
+            wardList.appendChild(wardChip);
+          });
+        }
+        wardContainer.classList.add('show');
+      });
+    });
+
+    // Coupon modal
+    function generateCode() {
+      const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+      return Array.from({length:6}, () => chars[Math.floor(Math.random()*chars.length)]).join('');
+    }
+    const btnCoupon = document.getElementById('btnCoupon');
+    const couponModal = document.getElementById('couponModal');
+    const couponCode = document.getElementById('couponCode');
+    const btnClose = document.getElementById('btnClose');
+    const btnCopy = document.getElementById('btnCopy');
+
+    btnCoupon.addEventListener('click', () => {
+      couponCode.textContent = generateCode();
+      couponModal.style.display = 'flex';
+    });
+    btnClose.addEventListener('click', () => couponModal.style.display = 'none');
+    btnCopy.addEventListener('click', () => {
+      navigator.clipboard.writeText(couponCode.textContent).then(() => {
+        btnCopy.textContent = '✅ Đã sao chép!';
+        setTimeout(() => btnCopy.textContent = '📋 Sao chép', 2000);
+      });
+    });
+    couponModal.addEventListener('click', e => { if (e.target === couponModal) couponModal.style.display = 'none'; });
+  </script>
+<!-- Kết nối Firebase -->
+<script type="module" src="firebase.js"></script>
+
+</body>
+</html>

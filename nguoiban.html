@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Trang Người Bán — Chợ Điện Thoại Cũ</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: #f5f7fa; min-height: 100vh; padding-bottom: 100px; }
+
+    /* ====== HEADER ====== */
+    .header { background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; padding: 24px 20px 28px; border-radius: 0 0 24px 24px; }
+    .back-btn { display: flex; align-items: center; gap: 6px; font-size: 15px; font-weight: 500; cursor: pointer; margin-bottom: 20px; border: none; background: none; color: white; }
+    .back-btn:active { opacity: 0.7; }
+    .user-info { display: flex; align-items: center; gap: 16px; }
+    .avatar { width: 60px; height: 60px; background: rgba(255,255,255,.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 700; }
+    .user-name { font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+    .user-status { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; opacity: 0.9; margin-top: 2px; }
+    .status-dot { width: 8px; height: 8px; background: #22c55e; border-radius: 50%; }
+
+    /* ====== THỐNG KÊ ====== */
+    .stats-container { padding: 0 20px; margin-top: -18px; }
+    .stats-card { background: white; border-radius: 16px; padding: 18px 16px; box-shadow: 0 2px 12px rgba(0,0,0,.06); display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .stat-item { text-align: center; }
+    .stat-num { font-size: 20px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+    .stat-label { font-size: 12px; color: #6b7280; }
+
+    /* ====== Ô LƯỢT XEM TỔNG ====== */
+    .total-views-box { margin: 20px; background: linear-gradient(135deg, #f0f9ff, #e0f2fe); border: 1px solid #bae6fd; border-radius: 12px; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
+    .views-label { font-size: 14px; font-weight: 500; color: #0369a1; }
+    .views-number { font-size: 22px; font-weight: 700; color: #0c4a6e; }
+
+    /* ====== CHỨC NĂNG ====== */
+    .section { padding: 0 20px; margin-top: 24px; }
+    .section-title { font-size: 17px; font-weight: 600; color: #111827; margin-bottom: 14px; }
+    .menu-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+    .menu-item { background: white; border-radius: 14px; padding: 18px 16px; text-align: center; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.04); transition: transform .2s; }
+    .menu-item:active { transform: scale(.97); }
+    .menu-icon { font-size: 26px; margin-bottom: 8px; }
+    .menu-text { font-size: 14px; font-weight: 600; color: #374151; }
+
+    /* ====== SẢN PHẨM ĐANG BÁN ====== */
+    .products-section { padding: 0 20px; margin-top: 28px; }
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .see-all { font-size: 14px; color: #3b82f6; font-weight: 500; cursor: pointer; }
+    .product-list { display: flex; flex-direction: column; gap: 12px; }
+    .product-card { background: white; border-radius: 14px; padding: 14px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
+    .product-img { width: 60px; height: 60px; background: #e5e7eb; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .product-info { flex: 1; min-width: 0; }
+    .product-name { font-size: 15px; font-weight: 600; color: #111827; margin-bottom: 4px; }
+    .product-meta { font-size: 12px; color: #6b7280; line-height: 1.4; }
+    .product-price { font-size: 15px; font-weight: 700; color: #dc2626; margin-top: 2px; }
+    .empty-state { text-align: center; padding: 40px 20px; color: #9ca3af; background: white; border-radius: 14px; }
+    .empty-icon { font-size: 40px; margin-bottom: 10px; }
+
+    /* ====== NÚT ĐĂNG BÁN CỐ ĐỊNH ====== */
+    .sell-btn-fixed { position: fixed; bottom: 24px; left: 20px; right: 20px; background: linear-gradient(135deg, #22c55e, #16a34a); color: white; border: none; border-radius: 14px; padding: 15px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 4px 14px rgba(34,197,94,.3); z-index: 100; transition: transform .2s; }
+    .sell-btn-fixed:active { transform: scale(.97); }
+
+    /* ====== ĐĂNG XUẤT ====== */
+    .logout-wrap { padding: 24px 20px 100px; }
+    .logout-btn { width: 100%; padding: 14px; background: #fef2f2; color: #dc2626; border: none; border-radius: 12px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    .logout-btn:active { background: #fecaca; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <button class="back-btn" onclick="window.location.href='index.html'">← Trang chủ</button>
+    <div class="user-info">
+      <div class="avatar" id="userAvatar">👤</div>
+      <div>
+        <h2 class="user-name" id="userName">Nguyễn Văn A</h2>
+        <span class="user-status"><span class="status-dot"></span> Đã xác minh</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- THỐNG KÊ CHUNG -->
+  <div class="stats-container">
+    <div class="stats-card">
+      <div class="stat-item">
+        <p class="stat-num" id="activeCount">0</p>
+        <p class="stat-label">Đang bán</p>
+      </div>
+      <div class="stat-item">
+        <p class="stat-num" id="soldCount">0</p>
+        <p class="stat-label">Đã bán</p>
+      </div>
+      <div class="stat-item">
+        <p class="stat-num" id="favoriteCount">0</p>
+        <p class="stat-label">Yêu thích</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ô TỔNG LƯỢT XEM - THEO Ý BẠN -->
+  <div class="total-views-box">
+    <span class="views-label">👁 Tổng lượt xem sản phẩm</span>
+    <span class="views-number" id="totalViews">0</span>
+  </div>
+
+  <!-- CHỨC NĂNG QUẢN LÝ -->
+  <div class="section">
+    <h3 class="section-title">Quản lý cửa hàng</h3>
+    <div class="menu-grid">
+      <div class="menu-item" onclick="alert('Chức năng đang phát triển!')">
+        <div class="menu-icon">📋</div>
+        <div class="menu-text">Sản phẩm của tôi</div>
+      </div>
+      <div class="menu-item" onclick="alert('Chức năng đang phát triển!')">
+        <div class="menu-icon">💬</div>
+        <div class="menu-text">Tin nhắn</div>
+      </div>
+      <div class="menu-item" onclick="alert('Chức năng đang phát triển!')">
+        <div class="menu-icon">📊</div>
+        <div class="menu-text">Thống kê</div>
+      </div>
+      <div class="menu-item" onclick="alert('Chức năng đang phát triển!')">
+        <div class="menu-icon">⚙️</div>
+        <div class="menu-text">Cài đặt</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SẢN PHẨM ĐANG BÁN -->
+  <div class="products-section">
+    <div class="section-header">
+      <h3 class="section-title">Sản phẩm đang bán</h3>
+      <span class="see-all" onclick="alert('Xem tất cả')">Xem tất cả →</span>
+    </div>
+    <div class="product-list" id="productList">
+      <div class="empty-state">
+        <div class="empty-icon">📱</div>
+        <p>Chưa có sản phẩm nào được đăng</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ĐĂNG XUẤT -->
+  <div class="logout-wrap">
+    <button class="logout-btn" id="logoutBtn">🚪 Đăng xuất</button>
+  </div>
+
+  <!-- NÚT ĐĂNG BÁN -->
+  <button class="sell-btn-fixed" onclick="alert('Chức năng Đăng sản phẩm sẽ mở sớm!')">
+    ➕ Đăng bán sản phẩm mới
+  </button>
+
+  <script>
+    // === KIỂM TRA ĐĂNG NHẬP ===
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+    
+    if (!currentUser) {
+      alert('Vui lòng đăng nhập trước!');
+      window.location.href = 'dangnhap.html';
+    } else {
+      // Hiển thị thông tin người dùng
+      document.getElementById('userName').textContent = currentUser.fullname || 'Người Bán';
+      document.getElementById('userAvatar').textContent = currentUser.fullname 
+        ? currentUser.fullname.charAt(0).toUpperCase() 
+        : '👤';
+    }
+
+    // === TÍNH TOÁN LƯỢT XEM — TỰ NHIÊN THEO THỜI GIAN ===
+    function calculateViews() {
+      // Lấy ngày đăng ký hoặc tạo ngày bắt đầu nếu chưa có
+      const joinDate = localStorage.getItem('joinDate') || new Date().toISOString();
+      if (!localStorage.getItem('joinDate')) localStorage.setItem('joinDate', joinDate);
+      
+      const start = new Date(joinDate);
+      const now = new Date();
+      const days = Math.max(1, Math.floor((now - start) / (1000 * 60 * 60 * 24)) + 1);
+      
+      // Công thức tăng tự nhiên: bắt đầu 28, tăng trung bình 8-12 lượt/ngày + biến động ngẫu nhiên
+      const base = 28;
+      const growth = days * (8 + Math.sin(days) * 3); // có lên có xuống tự nhiên
+      const randomFactor = 0.85 + Math.random() * 0.3; // ±15% biến động
+      const views = Math.round((base + growth) * randomFactor);
+      
+      return views;
+    }
+
+    // === CẬP NHẬT SỐ LƯỢT XEM ===
+    document.getElementById('totalViews').textContent = calculateViews();
+
+    // === ĐĂNG XUẤT ===
+    document.getElementById('logoutBtn').addEventListener('click', () => {
+      if (confirm('Bạn có chắc muốn đăng xuất?')) {
+        localStorage.removeItem('currentUser');
+        window.location.href = 'dangnhap.html';
+      }
+    });
+  </script>
+<!-- Kết nối Firebase -->
+<script type="module" src="firebase.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Đăng nhập — Chợ Điện Thoại Cũ</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: #f5f7fa; min-height: 100vh; padding: 20px; }
+
+    /* ====== NÚT QUAY LẠI ====== */
+    .back-btn { display: flex; align-items: center; gap: 6px; color: #3b82f6; font-size: 15px; font-weight: 500; cursor: pointer; margin-bottom: 24px; border: none; background: none; }
+    .back-btn:active { opacity: 0.7; }
+
+    /* ====== KHỐI CHÍNH ====== */
+    .container { max-width: 400px; margin: 0 auto; }
+    .logo-box { text-align: center; margin-bottom: 36px; }
+    .logo { width: 64px; height: 64px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; color: white; margin-bottom: 12px; }
+    .app-title { font-size: 22px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+    .app-desc { font-size: 14px; color: #6b7280; }
+
+    /* ====== FORM ====== */
+    .form-card { background: white; border-radius: 20px; padding: 32px 24px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+    .form-title { font-size: 20px; font-weight: 700; margin-bottom: 28px; color: #111827; text-align: center; }
+    .form-group { margin-bottom: 18px; }
+    label { display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px; }
+    input { width: 100%; padding: 15px 16px; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 15px; outline: none; transition: border .2s, box-shadow .2s; }
+    input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+    input.error { border-color: #ef4444; }
+
+    /* ====== QUÊN MẬT KHẨU ====== */
+    .forgot-wrap { text-align: right; margin-bottom: 24px; }
+    .forgot-link { font-size: 14px; color: #3b82f6; text-decoration: none; }
+    .forgot-link:active { opacity: 0.7; }
+
+    /* ====== NÚT ĐĂNG NHẬP ====== */
+    .btn-submit { width: 100%; padding: 15px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: all .2s; }
+    .btn-submit:active { transform: scale(.98); }
+    .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    /* ====== PHÂN CÁCH & LIÊN KẾT ====== */
+    .divider { display: flex; align-items: center; gap: 12px; margin: 28px 0 24px; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px solid #e5e7eb; }
+    .divider-text { font-size: 13px; color: #9ca3af; }
+    .link-text { text-align: center; font-size: 14px; color: #6b7280; }
+    .link-text a { color: #3b82f6; font-weight: 600; text-decoration: none; }
+
+    /* ====== THÔNG BÁO LỖI ====== */
+    .error-box { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 12px; border-radius: 10px; font-size: 14px; margin-bottom: 20px; display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Nút quay lại → về màn hình chính -->
+    <button class="back-btn" onclick="history.back()">← Quay lại</button>
+
+    <!-- Logo & Tên app -->
+    <div class="logo-box">
+      <div class="logo">📱</div>
+      <h1 class="app-title">Chợ Điện Thoại Cũ</h1>
+      <p class="app-desc">Đăng nhập để tiếp tục</p>
+    </div>
+
+    <!-- Form Đăng nhập -->
+    <div class="form-card">
+      <h2 class="form-title">Đăng nhập tài khoản</h2>
+
+      <!-- Thông báo lỗi -->
+      <div class="error-box" id="errorBox">Số điện thoại hoặc mật khẩu không đúng!</div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label>Số điện thoại hoặc Email</label>
+          <input type="text" id="account" placeholder="09xxxxxxxxx hoặc email@gmail.com" required>
+        </div>
+
+        <div class="form-group">
+          <label>Mật khẩu</label>
+          <input type="password" id="password" placeholder="Nhập mật khẩu" required>
+        </div>
+
+        <div class="forgot-wrap">
+          <a href="#" class="forgot-link" id="forgotPass">Quên mật khẩu?</a>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">🔐 Đăng nhập</button>
+      </form>
+
+      <div class="divider"><span class="divider-text">hoặc</span></div>
+
+      <p class="link-text">Chưa có tài khoản? <a href="dangky.html">Đăng ký ngay</a></p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('loginForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const errorBox = document.getElementById('errorBox');
+
+    // Hiển thị lỗi
+    function showError(message) {
+      errorBox.textContent = message;
+      errorBox.style.display = 'block';
+      setTimeout(() => errorBox.style.display = 'none', 4000);
+    }
+
+    // Kiểm tra tài khoản trong danh sách chờ & đã duyệt
+    function checkAccount(account, password) {
+      // Lấy dữ liệu đã đăng ký
+      const pendingUsers = JSON.parse(localStorage.getItem('pendingUsers') || '[]');
+      const approvedUsers = JSON.parse(localStorage.getItem('approvedUsers') || '[]');
+
+      // Tìm trong danh sách đã duyệt
+      const user = approvedUsers.find(u => 
+        (u.phone === account || u.email === account) && u.password === password
+      );
+      if (user) return { success: true, user };
+
+      // Tìm trong danh sách chờ duyệt
+      const pending = pendingUsers.find(u => 
+        (u.phone === account || u.email === account)
+      );
+      if (pending) return { success: false, reason: 'pending' };
+
+      // Không tìm thấy
+      return { success: false, reason: 'notfound' };
+    }
+
+    // Gửi form đăng nhập
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      const account = document.getElementById('account').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (!account || !password) {
+        showError('Vui lòng nhập đầy đủ thông tin!');
+        return;
+      }
+
+      // Hiệu ứng đang xử lý
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ Đang kiểm tra...';
+
+      // Giả lập độ trễ
+      await new Promise(resolve => setTimeout(resolve, 1000));
+
+      // Kiểm tra tài khoản
+      const result = checkAccount(account, password);
+
+      submitBtn.disabled = false;
+      submitBtn.textContent = '🔐 Đăng nhập';
+
+      if (result.success) {
+        // Lưu phiên đăng nhập
+        localStorage.setItem('currentUser', JSON.stringify(result.user));
+        // Chuyển về trang chủ hoặc trang hồ sơ
+        alert('✅ Đăng nhập thành công!');
+        window.location.href = 'nguoiban.html';
+      } else {
+        if (result.reason === 'pending') {
+          showError('⏳ Tài khoản đang chờ quản trị viên duyệt. Vui lòng kiểm tra email!');
+        } else {
+          showError('❌ Số điện thoại/Email hoặc mật khẩu không đúng!');
+        }
+      }
+    });
+
+    // Quên mật khẩu — thông báo chức năng đang phát triển
+    document.getElementById('forgotPass').addEventListener('click', e => {
+      e.preventDefault();
+      alert('📧 Vui lòng liên hệ hỗ trợ qua: support@chodienthoaicũ.vn\nChúng tôi sẽ hướng dẫn lấy lại mật khẩu!');
+    });
+  </script>
+<!-- Kết nối Firebase -->
+<script type="module" src="firebase.js"></script>
+
+</body>
+</html>

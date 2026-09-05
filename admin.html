@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Trang Quản Trị — Chợ Điện Thoại Cũ</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: #f5f7fa; min-height: 100vh; padding-bottom: 40px; }
+
+    /* ====== HEADER ====== */
+    .header { background: linear-gradient(135deg, #1f2937, #111827); color: white; padding: 24px 20px; }
+    .header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .page-title { font-size: 22px; font-weight: 700; }
+    .admin-badge { background: #f59e0b; color: white; padding: 6px 12px; border-radius: 20px; font-size: 13px; font-weight: 600; }
+    .stats-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 16px; }
+    .stat-box { background: rgba(255,255,255,.1); border-radius: 12px; padding: 12px 8px; text-align: center; }
+    .stat-num { font-size: 18px; font-weight: 700; margin-bottom: 4px; }
+    .stat-label { font-size: 11px; opacity: 0.7; }
+
+    /* ====== TAB CHỨC NĂNG ====== */
+    .tab-wrap { padding: 12px 20px 0; display: flex; gap: 8px; overflow-x: auto; background: white; }
+    .tab-btn { padding: 10px 16px; border: none; background: none; font-size: 14px; font-weight: 500; color: #6b7280; border-bottom: 3px solid transparent; cursor: pointer; white-space: nowrap; }
+    .tab-btn.active { color: #3b82f6; border-bottom-color: #3b82f6; font-weight: 600; }
+
+    /* ====== BỘ LỌC ====== */
+    .filter-wrap { padding: 16px 20px; display: flex; gap: 8px; overflow-x: auto; background: white; border-bottom: 1px solid #e5e7eb; }
+    .filter-btn { padding: 7px 14px; border-radius: 20px; border: none; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; background: #f3f4f6; color: #374151; }
+    .filter-btn.active { background: #3b82f6; color: white; }
+
+    /* ====== DANH SÁCH ====== */
+    .container { padding: 16px 20px; }
+    .user-card, .product-card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 12px; box-shadow: 0 2px 6px rgba(0,0,0,.04); }
+    .user-header, .product-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .user-info h3, .product-info h3 { font-size: 16px; font-weight: 600; color: #111827; margin-bottom: 4px; }
+    .user-info p, .product-info p { font-size: 13px; color: #6b7280; line-height: 1.5; }
+    .status-tag { font-size: 12px; padding: 4px 10px; border-radius: 12px; font-weight: 600; }
+    .status-pending { background: #fef3c7; color: #d97706; }
+    .status-approved { background: #dcfce7; color: #16a34a; }
+    .status-rejected { background: #fee2e2; color: #dc2626; }
+    .status-banned { background: #e5e7eb; color: #6b7280; }
+
+    /* ====== NÚT HÀNH ĐỘNG ====== */
+    .action-row { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .btn-approve { padding: 9px 12px; background: #22c55e; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-reject { padding: 9px 12px; background: #ef4444; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-ban { padding: 9px 12px; background: #f59e0b; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-delete { padding: 9px 12px; background: #dc2626; color: white; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-view { padding: 9px 12px; background: #f3f4f6; color: #374151; border: none; border-radius: 10px; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .btn-approve:active, .btn-reject:active, .btn-ban:active, .btn-delete:active, .btn-view:active { transform: scale(.97); }
+
+    /* ====== MODAL XÁC NHẬN ====== */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; z-index: 300; padding: 20px; }
+    .modal-card { background: white; border-radius: 20px; padding: 24px; width: 100%; max-width: 360px; animation: popIn .3s ease; }
+    @keyframes popIn { from{transform: scale(.9);opacity:0;} to{transform: scale(1);opacity:1;} }
+    .modal-title { font-size: 18px; font-weight: 700; margin-bottom: 12px; color: #111827; }
+    .modal-desc { font-size: 14px; color: #6b7280; margin-bottom: 16px; line-height: 1.5; }
+    textarea { width: 100%; padding: 12px; border: 1px solid #e5e7eb; border-radius: 10px; font-size: 14px; min-height: 70px; outline: none; resize: none; margin-bottom: 16px; }
+    textarea:focus { border-color: #3b82f6; }
+    .modal-buttons { display: flex; gap: 10px; }
+    .modal-cancel { flex: 1; padding: 12px; background: #f3f4f6; color: #374151; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    .modal-confirm { flex: 1; padding: 12px; background: #3b82f6; color: white; border: none; border-radius: 10px; font-size: 15px; font-weight: 600; cursor: pointer; }
+    .modal-confirm.danger { background: #dc2626; }
+
+    /* ====== THÔNG BÁO ====== */
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px); background: #1f2937; color: white; padding: 12px 20px; border-radius: 10px; font-size: 14px; font-weight: 500; z-index: 400; transition: transform .3s ease; }
+    .toast.show { transform: translateX(-50%) translateY(0); }
+    .empty-state { text-align: center; padding: 40px 20px; color: #9ca3af; }
+    .empty-icon { font-size: 48px; margin-bottom: 12px; }
+
+    /* Ẩn/hiện tab nội dung */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-top">
+      <h1 class="page-title">🔧 Quản trị viên</h1>
+      <span class="admin-badge">ADMIN</span>
+    </div>
+    <div class="stats-row">
+      <div class="stat-box">
+        <p class="stat-num" id="pendingCount">0</p>
+        <p class="stat-label">Chờ duyệt</p>
+      </div>
+      <div class="stat-box">
+        <p class="stat-num" id="approvedCount">0</p>
+        <p class="stat-label">Đã duyệt</p>
+      </div>
+      <div class="stat-box">
+        <p class="stat-num" id="bannedCount">0</p>
+        <p class="stat-label">Đã khóa</p>
+      </div>
+      <div class="stat-box">
+        <p class="stat-num" id="productsCount">0</p>
+        <p class="stat-label">Bài đăng</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- TAB CHỨC NĂNG -->
+  <div class="tab-wrap">
+    <button class="tab-btn active" data-tab="users">👤 Tài khoản</button>
+    <button class="tab-btn" data-tab="products">📱 Bài đăng</button>
+  </div>
+
+  <!-- BỘ LỌC TÀI KHOẢN -->
+  <div class="tab-content active" id="tab-users">
+    <div class="filter-wrap">
+      <button class="filter-btn active" data-filter="all">Tất cả</button>
+      <button class="filter-btn" data-filter="pending">⏳ Chờ duyệt</button>
+      <button class="filter-btn" data-filter="approved">✅ Đã duyệt</button>
+      <button class="filter-btn" data-filter="banned">🚫 Đã khóa</button>
+    </div>
+    <div class="container" id="userList">
+      <div class="empty-state"><div class="empty-icon">📋</div><p>Đang tải dữ liệu...</p></div>
+    </div>
+  </div>
+
+  <!-- BỘ LỌC BÀI ĐĂNG -->
+  <div class="tab-content" id="tab-products">
+    <div class="filter-wrap">
+      <button class="filter-btn active" data-filter="all">Tất cả bài đăng</button>
+      <button class="filter-btn" data-filter="active">✅ Đang hiển thị</button>
+      <button class="filter-btn" data-filter="sold">✅ Đã bán</button>
+      <button class="filter-btn" data-filter="hidden">🚫 Đã ẩn/xóa</button>
+    </div>
+    <div class="container" id="productList">
+      <div class="empty-state"><div class="empty-icon">📱</div><p>Chưa có bài đăng nào.</p></div>
+    </div>
+  </div>
+
+  <!-- MODAL: XÁC NHẬN HÀNH ĐỘNG -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-card">
+      <h3 class="modal-title" id="confirmTitle">Xác nhận hành động</h3>
+      <p class="modal-desc" id="confirmDesc">Bạn có chắc chắn muốn thực hiện hành động này?</p>
+      <textarea id="confirmReason" placeholder="Nhập lý do (gửi thông báo cho người dùng)..."></textarea>
+      <div class="modal-buttons">
+        <button class="modal-cancel" onclick="closeModal('confirmModal')">Hủy</button>
+        <button class="modal-confirm danger" id="confirmBtn">Xác nhận</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: THÔNG BÁO THÀNH CÔNG -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-card">
+      <div style="font-size: 48px; text-align: center; margin-bottom: 12px;">✅</div>
+      <h3 class="modal-title" style="text-align: center;">Thành công!</h3>
+      <p class="modal-desc" id="successText" style="text-align: center;">Đã cập nhật trạng thái.</p>
+      <button class="modal-confirm" style="width:100%; margin-top:8px;" onclick="closeModal('successModal')">Đã hiểu</button>
+    </div>
+  </div>
+
+  <!-- THÔNG BÁO NHẸ -->
+  <div class="toast" id="toast">Đã cập nhật!</div>
+
+  <script>
+    // === DỮ LIỆU ===
+    let currentTab = 'users';
+    let userFilter = 'all';
+    let productFilter = 'all';
+    let pendingUsers = [];
+    let approvedUsers = [];
+    let bannedUsers = [];
+    let products = [];
+    let pendingAction = null;
+
+    // === TẢI DỮ LIỆU ===
+    function loadData() {
+      pendingUsers = JSON.parse(localStorage.getItem('pendingUsers') || '[]');
+      approvedUsers = JSON.parse(localStorage.getItem('approvedUsers') || '[]');
+      bannedUsers = JSON.parse(localStorage.getItem('bannedUsers') || '[]');
+      products = JSON.parse(localStorage.getItem('products') || '[]');
+      
+      updateStats();
+      renderUserList();
+      renderProductList();
+    }
+
+    // === CẬP NHẬT THỐNG KÊ ===
+    function updateStats() {
+      document.getElementById('pendingCount').textContent = pendingUsers.length;
+      document.getElementById('approvedCount').textContent = approvedUsers.length;
+      document.getElementById('bannedCount').textContent = bannedUsers.length;
+      document.getElementById('productsCount').textContent = products.length;
+    }
+
+    // === CHUYỂN TAB ===
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        currentTab = btn.dataset.tab;
+        document.getElementById(`tab-${currentTab}`).classList.add('active');
+      });
+    });
+
+    // === LỌC TÀI KHOẢN ===
+    document.querySelectorAll('#tab-users .filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#tab-users .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        userFilter = btn.dataset.filter;
+        renderUserList();
+      });
+    });
+
+    // === LỌC BÀI ĐĂNG ===
+    document.querySelectorAll('#tab-products .filter-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('#tab-products .filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        productFilter = btn.dataset.filter;
+        renderProductList();
+      });
+    });
+
+    // === HIỂN THỊ DANH SÁCH TÀI KHOẢN ===
+    function renderUserList() {
+      const listEl = document.getElementById('userList');
+      let allUsers = [];
+
+      pendingUsers.forEach((u, i) => allUsers.push({ ...u, status: 'pending', idx: i }));
+      approvedUsers.forEach((u, i) => allUsers.push({ ...u, status: 'approved', idx: i }));
+      bannedUsers.forEach((u, i) => allUsers.push({ ...u, status: 'banned', idx: i }));
+
+      if (userFilter !== 'all') allUsers = allUsers.filter(u => u.status === userFilter);
+      allUsers.sort((a, b) => new Date(b.registeredAt) - new Date(a.registeredAt));
+
+      if (allUsers.length === 0) {
+        listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>Không có tài khoản nào.</p></div>`;
+        return;
+      }
+
+      listEl.innerHTML = allUsers.map((user, gIdx) => {
+        const statusClass = { pending: 'status-pending', approved: 'status-approved', banned: 'status-banned' }[user.status];
+        const statusText = { pending: '⏳ Chờ duyệt', approved: '✅ Đã duyệt', banned: '🚫 Đã khóa' }[user.status];
+        
+        return `
+          <div class="user-card">
+            <div class="user-header">
+              <div class="user-info">
+                <h3>${user.fullname}</h3>
+                <p>📞 ${user.phone}<br>📧 ${user.email}</p>
+              </div>
+              <span class="status-tag ${statusClass}">${statusText}</span>
+            </div>
+            <div class="action-row">
+              <button class="btn-view" onclick="viewUser(${gIdx}, '${user.status}')">👁 Xem</button>
+              ${user.status === 'pending' ? `<button class="btn-approve" onclick="approveUser(${gIdx})">✅ Duyệt</button>` : ''}
+              ${user.status === 'pending' ? `<button class="btn-reject" onclick="rejectUser(${gIdx})">❌ Từ chối</button>` : ''}
+              ${user.status === 'approved' ? `<button class="btn-ban" onclick="banUser(${gIdx})">🚫 Khóa tài khoản</button>` : ''}
+              ${user.status === 'banned' ? `<button class="btn-approve" onclick="unbanUser(${gIdx})">🔓 Mở khóa</button>` : ''}
+              <button class="btn-delete" onclick="deleteUser(${gIdx}, '${user.status}')">🗑 Xóa vĩnh viễn</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // === HIỂN THỊ DANH SÁCH BÀI ĐĂNG ===
+    function renderProductList() {
+      const listEl = document.getElementById('productList');
+      let filtered = [...products];
+      
+      if (productFilter !== 'all') filtered = filtered.filter(p => p.status === productFilter);
+      filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+      if (filtered.length === 0) {
+        listEl.innerHTML = `<div class="empty-state"><div class="empty-icon">📱</div><p>Chưa có bài đăng nào.</p></div>`;
+        return;
+      }
+
+      listEl.innerHTML = filtered.map((prod, idx) => `
+        <div class="product-card">
+          <div class="product-header">
+            <div class="product-info">
+              <h3>${prod.name || 'Điện thoại'}</h3>
+              <p>💰 ${prod.price || 'Liên hệ'}<br>📍 ${prod.location || 'Chưa rõ'}<br>Người bán: ${prod.sellerName || 'Ẩn'}</p>
+            </div>
+            <span class="status-tag ${prod.status === 'sold' ? 'status-rejected' : prod.status === 'hidden' ? 'status-banned' : 'status-approved'}">
+              ${prod.status === 'sold' ? '✅ Đã bán' : prod.status === 'hidden' ? '🚫 Đã ẩn' : '✅ Đang hiển thị'}
+            </span>
+          </div>
+          <div class="action-row">
+            <button class="btn-view" onclick="viewProduct(${idx})">👁 Xem</button>
+            ${prod.status !== 'sold' ? `<button class="btn-reject" onclick="markSold(${idx})">✅ Đánh đã bán</button>` : ''}
+            ${prod.status !== 'hidden' ? `<button class="btn-ban" onclick="hideProduct(${idx})">🚫 Ẩn bài</button>` : ''}
+            ${prod.status === 'hidden' ? `<button class="btn-approve" onclick="showProduct(${idx})">🔓 Hiện bài</button>` : ''}
+            <button class="btn-delete" onclick="deleteProduct(${idx})">🗑 Xóa vĩnh viễn</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // === HÀNH ĐỘNG TÀI KHOẢN ===
+    function approveUser(gIdx) {
+      const user = pendingUsers[gIdx];
+      if (!user) return;
+      pendingAction = { type: 'approveUser', gIdx, user };
+      showConfirm('✅ Duyệt tài khoản', `Duyệt tài khoản <strong>${user.fullname}</strong> — gửi email thông báo kích hoạt?`, 'Đã duyệt tài khoản và gửi email thông báo đến: ' + user.email);
+    }
+
+    function rejectUser(gIdx) {
+      const user = pendingUsers[gIdx];
+      if (!user) return;
+      pendingAction = { type: 'rejectUser', gIdx, user };
+      showConfirm('❌ Từ chối tài khoản', `Từ chối tài khoản <strong>${user.fullname}</strong> — nhập lý do gửi qua email:`, 'Đã từ chối tài khoản & gửi email thông báo đến: ' + user.email);
+    }
+
+    function banUser(gIdx) {
+      const user = approvedUsers[gIdx];
+      if (!user) return;
+      pendingAction = { type: 'banUser', gIdx, user };
+      showConfirm('🚫 Khóa tài khoản', `Khóa tài khoản <strong>${user.fullname}</strong> — người dùng sẽ không thể đăng nhập:`, 'Đã khóa tài khoản & gửi email thông báo đến: ' + user.email);
+    }
+
+    function unbanUser(gIdx) {
+      const user = bannedUsers[gIdx];
+      if (!user) return;
+      pendingAction = { type: 'unbanUser', gIdx, user };
+      showConfirm('🔓 Mở khóa tài khoản', `Mở khóa tài khoản <strong>${user.fullname}</strong>?`, 'Đã mở khóa tài khoản & gửi email thông báo đến: ' + user.email);
+    }
+
+    function deleteUser(gIdx, status) {
+      const lists = { pending: pendingUsers, approved: approvedUsers, banned: bannedUsers };
+      const user = lists[status][gIdx];
+      if (!user) return;
+      pendingAction = { type: 'deleteUser', gIdx, status, user };
+      showConfirm('🗑 Xóa tài khoản', `XÓA VĨNH VIỄN tài khoản <strong>${user.fullname}</strong> — không thể khôi phục!`, 'Đã xóa tài khoản vĩnh viễn: ' + user.email);
+    }
+
+    function viewUser(gIdx, status) {
+      const lists = { pending: pendingUsers, approved: approvedUsers, banned: bannedUsers };
+      const user = lists[status][gIdx];
+      alert(`📋 Thông tin tài khoản:\n\nTên: ${user.fullname}\nSĐT: ${user.phone}\nEmail: ${user.email}\nMật khẩu: ${user.password}\nTrạng thái: ${status}`);
+    }
+
+    // === HÀNH ĐỘNG BÀI ĐĂNG ===
+    function markSold(idx) {
+      pendingAction = { type: 'markSold', idx };
+      showConfirm('✅ Đánh đã bán', 'Đánh dấu bài đăng này là đã bán?', 'Đã đánh dấu: Đã bán');
+    }
+
+    function hideProduct(idx) {
+      pendingAction = { type: 'hideProduct', idx };
+      showConfirm('🚫 Ẩn bài đăng', 'Ẩn bài đăng khỏi trang hiển thị?', 'Đã ẩn bài đăng');
+    }
+
+    function showProduct(idx) {
+      pendingAction = { type: 'showProduct', idx };
+      showConfirm('🔓 Hiện bài đăng', 'Hiện lại bài đăng?', 'Đã hiện bài đăng');
+    }
+
+    function deleteProduct(idx) {
+      pendingAction = { type: 'deleteProduct', idx };
+      showConfirm('🗑 Xóa bài đăng', 'XÓA VĨNH VIỄN bài đăng này — không thể khôi phục!', 'Đã xóa bài đăng vĩnh viễn');
+    }
+
+    function viewProduct(idx) {
+      const p = products[idx] || { name: 'Chưa có dữ liệu' };
+      alert(`📱 Chi tiết bài đăng:\n\nTên: ${p.name || '---'}\nGiá: ${p.price || '---'}\nNgười bán: ${p.sellerName || '---'}\nTrạng thái: ${p.status || '---'}`);
+    }
+
+    // === MODAL XÁC NHẬN ===
+    function showConfirm(title, desc, successMsg) {
+      document.getElementById('confirmTitle').textContent = title;
+      document.getElementById('confirmDesc').innerHTML = desc;
+      document.getElementById('confirmReason').value = '';
+      document.getElementById('successText').textContent = successMsg;
+      openModal('confirmModal');
+    }
+
+    document.getElementById('confirmBtn').addEventListener('click', () => {
+      if (!pendingAction) return;
+      const reason = document.getElementById('confirmReason').value.trim() || 'Không có lý do cụ thể.';
+      const { type, gIdx, idx, status, user } = pendingAction;
+
+      // Thực thi hành động
+      if (type === 'approveUser') {
+        approvedUsers.push(pendingUsers[gIdx]);
+        pendingUsers.splice(gIdx, 1);
+        localStorage.setItem('pendingUsers', JSON.stringify(pendingUsers));
+        localStorage.setItem('approvedUsers', JSON.stringify(approvedUsers));
+      } else if (type === 'rejectUser') {
+        pendingUsers.splice(gIdx, 1);
+        localStorage.setItem('pendingUsers', JSON.stringify(pendingUsers));
+      } else if (type === 'banUser') {
+        bannedUsers.push(approvedUsers[gIdx]);
+        approvedUsers.splice(gIdx, 1);
+        localStorage.setItem('approvedUsers', JSON.stringify(approvedUsers));
+        localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
+      } else if (type === 'unbanUser') {
+        approvedUsers.push(bannedUsers[gIdx]);
+        bannedUsers.splice(gIdx, 1);
+        localStorage.setItem('approvedUsers', JSON.stringify(approvedUsers));
+        localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
+      } else if (type === 'deleteUser') {
+        const lists = { pending: pendingUsers, approved: approvedUsers, banned: bannedUsers };
+        lists[status].splice(gIdx, 1);
+        localStorage.setItem('pendingUsers', JSON.stringify(pendingUsers));
+        localStorage.setItem('approvedUsers', JSON.stringify(approvedUsers));
+        localStorage.setItem('bannedUsers', JSON.stringify(bannedUsers));
+      } else if (type === 'markSold') {
+        if (products[idx]) products[idx].status = 'sold';
+        localStorage.setItem('products', JSON.stringify(products));
+      } else if (type === 'hideProduct') {
+        if (products[idx]) products[idx].status = 'hidden';
+        localStorage.setItem('products', JSON.stringify(products));
+      } else if (type === 'showProduct') {
+        if (products[idx]) products[idx].status = 'active';
+        localStorage.setItem('products', JSON.stringify(products));
+      } else if (type === 'deleteProduct') {
+        products.splice(idx, 1);
+        localStorage.setItem('products', JSON.stringify(products));
+      }
+
+      closeModal('confirmModal');
+      openModal('successModal');
+      loadData();
+      pendingAction = null;
+    });
+
+    // === MODAL CONTROL ===
+    function openModal(id) {
+      document.getElementById(id).style.display = 'flex';
+      document.body.style.overflow = 'hidden';
+    }
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+      document.body.style.overflow = 'auto';
+      pendingAction = null;
+    }
+
+    // === KHỞI TẠI ===
+    loadData();
+  </script>
+<!-- Kết nối Firebase -->
+<script type="module" src="firebase.js"></script>
+
+</body>
+</html>

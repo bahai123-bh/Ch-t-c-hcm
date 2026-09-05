@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Đăng ký — Chợ Điện Thoại Cũ</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background: #f5f7fa; min-height: 100vh; padding: 20px; }
+
+    /* ====== NÚT QUAY LẠI ====== */
+    .back-btn { display: flex; align-items: center; gap: 6px; color: #3b82f6; font-size: 15px; font-weight: 500; cursor: pointer; margin-bottom: 24px; border: none; background: none; }
+    .back-btn:active { opacity: 0.7; }
+
+    /* ====== KHỐI CHÍNH ====== */
+    .container { max-width: 400px; margin: 0 auto; }
+    .logo-box { text-align: center; margin-bottom: 28px; }
+    .logo { width: 64px; height: 64px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; font-size: 32px; color: white; margin-bottom: 12px; }
+    .app-title { font-size: 22px; font-weight: 700; color: #111827; margin-bottom: 4px; }
+    .app-desc { font-size: 14px; color: #6b7280; }
+
+    /* ====== FORM ====== */
+    .form-card { background: white; border-radius: 20px; padding: 28px 24px; box-shadow: 0 2px 8px rgba(0,0,0,.05); }
+    .form-title { font-size: 20px; font-weight: 700; margin-bottom: 24px; color: #111827; text-align: center; }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; font-size: 14px; font-weight: 500; color: #374151; margin-bottom: 8px; }
+    input { width: 100%; padding: 14px 16px; border: 1px solid #e5e7eb; border-radius: 12px; font-size: 15px; outline: none; transition: border .2s, box-shadow .2s; }
+    input:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,.1); }
+    input.error { border-color: #ef4444; }
+
+    /* ====== NÚT GỬI ====== */
+    .btn-submit { width: 100%; padding: 15px; background: linear-gradient(135deg, #3b82f6, #1d4ed8); color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; margin-top: 8px; transition: all .2s; }
+    .btn-submit:active { transform: scale(.98); }
+    .btn-submit:disabled { opacity: .6; cursor: not-allowed; transform: none; }
+
+    /* ====== PHÂN CÁCH & LIÊN KẾT ====== */
+    .divider { display: flex; align-items: center; gap: 12px; margin: 24px 0; }
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px solid #e5e7eb; }
+    .divider-text { font-size: 13px; color: #9ca3af; }
+    .link-text { text-align: center; margin-top: 20px; font-size: 14px; color: #6b7280; }
+    .link-text a { color: #3b82f6; font-weight: 600; text-decoration: none; }
+
+    /* ====== MODAL THÔNG BÁO CHỜ DUYỆT ====== */
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,.5); display: none; align-items: center; justify-content: center; z-index: 300; padding: 20px; }
+    .modal-card { background: white; border-radius: 20px; padding: 32px 24px; width: 100%; max-width: 360px; text-align: center; animation: popIn .3s ease; }
+    @keyframes popIn { from{transform: scale(.9);opacity:0;} to{transform: scale(1);opacity:1;} }
+    .modal-icon { font-size: 64px; margin-bottom: 16px; }
+    .modal-title { font-size: 20px; font-weight: 700; color: #111827; margin-bottom: 12px; }
+    .modal-desc { font-size: 15px; color: #6b7280; line-height: 1.6; margin-bottom: 24px; }
+    .modal-btn { width: 100%; padding: 14px; background: #3b82f6; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; }
+    .modal-btn:active { background: #2563eb; }
+
+    /* ====== THÔNG BÁO LỖI ====== */
+    .error-text { color: #ef4444; font-size: 13px; margin-top: 6px; display: none; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Nút quay lại -->
+    <button class="back-btn" onclick="history.back()">← Quay lại</button>
+
+    <!-- Logo & Tên app -->
+    <div class="logo-box">
+      <div class="logo">📱</div>
+      <h1 class="app-title">Chợ Điện Thoại Cũ</h1>
+      <p class="app-desc">Tạo tài khoản để đăng bán & mua máy dễ dàng</p>
+    </div>
+
+    <!-- Form Đăng ký -->
+    <div class="form-card">
+      <h2 class="form-title">Đăng ký tài khoản</h2>
+      <form id="registerForm">
+        <div class="form-group">
+          <label>Họ và tên *</label>
+          <input type="text" id="fullname" placeholder="Nguyễn Văn A" required>
+          <p class="error-text" id="nameError">Vui lòng nhập họ tên</p>
+        </div>
+
+        <div class="form-group">
+          <label>Số điện thoại *</label>
+          <input type="tel" id="phone" placeholder="09xxxxxxxxx" required>
+          <p class="error-text" id="phoneError">Số điện thoại không hợp lệ</p>
+        </div>
+
+        <div class="form-group">
+          <label>Email (để nhận thông báo duyệt tài khoản) *</label>
+          <input type="email" id="email" placeholder="email@gmail.com" required>
+          <p class="error-text" id="emailError">Email không hợp lệ</p>
+        </div>
+
+        <div class="form-group">
+          <label>Mật khẩu *</label>
+          <input type="password" id="password" placeholder="Tối thiểu 6 ký tự" required>
+          <p class="error-text" id="passError">Mật khẩu ít nhất 6 ký tự</p>
+        </div>
+
+        <div class="form-group">
+          <label>Xác nhận mật khẩu *</label>
+          <input type="password" id="confirmPassword" placeholder="Nhập lại mật khẩu" required>
+          <p class="error-text" id="confirmError">Mật khẩu không khớp</p>
+        </div>
+
+        <button type="submit" class="btn-submit" id="submitBtn">✅ Tạo tài khoản</button>
+      </form>
+
+      <div class="divider"><span class="divider-text">hoặc</span></div>
+
+      <p class="link-text">Đã có tài khoản? <a href="dangnhap.html">Đăng nhập ngay</a></p>
+    </div>
+  </div>
+
+  <!-- MODAL: Thông báo gửi yêu cầu thành công -->
+  <div class="modal-overlay" id="successModal">
+    <div class="modal-card">
+      <div class="modal-icon">⏳</div>
+      <h3 class="modal-title">Gửi yêu cầu thành công!</h3>
+      <p class="modal-desc">Yêu cầu tạo tài khoản của bạn đã được gửi đến quản trị viên.<br><br>📧 Chúng tôi sẽ gửi email thông báo khi tài khoản được phê duyệt hoặc từ chối. Vui lòng kiểm tra hộp thư của bạn nhé!</p>
+      <button class="modal-btn" onclick="closeModal()">Đã hiểu</button>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('registerForm');
+    const submitBtn = document.getElementById('submitBtn');
+    const successModal = document.getElementById('successModal');
+
+    // Hiển thị lỗi
+    function showError(id, show) {
+      const el = document.getElementById(id);
+      el.style.display = show ? 'block' : 'none';
+      el.previousElementSibling.classList.toggle('error', show);
+    }
+
+    // Kiểm tra form
+    function validateForm() {
+      let valid = true;
+      
+      const name = document.getElementById('fullname').value.trim();
+      const phone = document.getElementById('phone').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const pass = document.getElementById('password').value;
+      const confirm = document.getElementById('confirmPassword').value;
+
+      // Họ tên
+      if (name.length < 2) { showError('nameError', true); valid = false; } else showError('nameError', false);
+
+      // Số điện thoại
+      const phoneRegex = /^(0|\+84)(\d{9,10})$/;
+      if (!phoneRegex.test(phone.replace(/\s/g,''))) { showError('phoneError', true); valid = false; } else showError('phoneError', false);
+
+      // Email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) { showError('emailError', true); valid = false; } else showError('emailError', false);
+
+      // Mật khẩu
+      if (pass.length < 6) { showError('passError', true); valid = false; } else showError('passError', false);
+
+      // Xác nhận mật khẩu
+      if (pass !== confirm) { showError('confirmError', true); valid = false; } else showError('confirmError', false);
+
+      return valid;
+    }
+
+    // Gửi form
+    form.addEventListener('submit', async function(e) {
+      e.preventDefault();
+      
+      if (!validateForm()) return;
+
+      // Hiệu ứng đang gửi
+      submitBtn.disabled = true;
+      submitBtn.textContent = '⏳ Đang gửi...';
+
+      // Thu thập dữ liệu
+      const userData = {
+        fullname: document.getElementById('fullname').value.trim(),
+        phone: document.getElementById('phone').value.trim(),
+        email: document.getElementById('email').value.trim(),
+        password: document.getElementById('password').value,
+        registeredAt: new Date().toISOString(),
+        status: 'pending' // pending → chờ duyệt, approved → đã duyệt, rejected → từ chối
+      };
+
+      // === GỬI DỮ LIỆU ĐẾN ADMIN ===
+      // Ở đây sẽ kết nối backend để lưu dữ liệu và thông báo cho admin
+      // Hiện tại: Lưu tạm localStorage để demo
+      let pendingUsers = JSON.parse(localStorage.getItem('pendingUsers') || '[]');
+      pendingUsers.push(userData);
+      localStorage.setItem('pendingUsers', JSON.stringify(pendingUsers));
+
+      // Giả lập độ trễ gửi server
+      await new Promise(resolve => setTimeout(resolve, 1200));
+
+      // Hiển thị thông báo thành công
+      submitBtn.disabled = false;
+      submitBtn.textContent = '✅ Tạo tài khoản';
+      successModal.style.display = 'flex';
+
+      // Reset form
+      form.reset();
+    });
+
+    // Đóng modal
+    function closeModal() {
+      successModal.style.display = 'none';
+      // Có thể chuyển về trang chủ sau khi đóng
+      // window.location.href = 'index.html';
+    }
+
+    // Đóng modal khi bấm ra ngoài
+    successModal.addEventListener('click', e => {
+      if (e.target === successModal) closeModal();
+    });
+  </script>
+<!-- Kết nối Firebase -->
+<script type="module" src="firebase.js"></script>
+
+</body>
+</html>
